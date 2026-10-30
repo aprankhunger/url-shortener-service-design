@@ -1,6 +1,7 @@
 "use client"
 
 import { useState } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
@@ -11,6 +12,7 @@ import { api } from "@/lib/client"
 export function AuthForm({ mode }: { mode: "login" | "register" }) {
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
+  const router = useRouter()
   const isLogin = mode === "login"
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -20,7 +22,8 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
     setError(null)
     try {
       await api(`/api/auth/${mode}`, { method: "POST", json: { email: form.get("email"), password: form.get("password") } })
-      window.location.assign("/dashboard")
+      router.refresh()
+      router.replace("/dashboard")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.")
       setPending(false)
