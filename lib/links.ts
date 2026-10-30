@@ -2,7 +2,7 @@ import "server-only"
 import { customAlphabet, nanoid } from "nanoid"
 import { UAParser } from "ua-parser-js"
 import countries from "i18n-iso-countries"
-import { db, insertUrl, removeUrl } from "@/lib/db"
+import { db, insertUrl, removeUrl, loadUrl, persistClick, persistUrl } from "@/lib/db"
 import { hashIp, hashPassword, verifyPassword } from "@/lib/crypto"
 import { checkDestination } from "@/lib/safety"
 import type {
@@ -89,7 +89,7 @@ export type CreateLinkInput = {
   oneTime?: unknown
 }
 
-export function createLink(input: CreateLinkInput, userId: string | null, ownHost: string | null): PublicUrl {
+export async function createLink(input: CreateLinkInput, userId: string | null, ownHost: string | null): Promise<PublicUrl> {
   const destination = checkDestination(input.longUrl, ownHost)
   if (!destination.ok) throw new LinkError(destination.reason, 422)
 
@@ -118,6 +118,7 @@ export function createLink(input: CreateLinkInput, userId: string | null, ownHos
     createdAt: Date.now(),
   }
   insertUrl(store, url)
+  await persistUrl(url)
   return toPublic(url)
 }
 
@@ -195,6 +196,15 @@ export type ResolveResult =
   | { status: "not_found" | "disabled" | "expired" | "exhausted" }
 
 /** Hot path: one indexed Map lookup plus a few comparisons. */
+export async function resolveCodePersistent(code: string): Promise<ResolveResult> {
+  const stored = await loadUrl(code)
+  if (stored) {
+    const store = db()
+    insertUrl(store, stored)
+  }
+  return resolveCode(code)
+}
+
 export function resolveCode(code: string): ResolveResult {
   const store = db()
   const id = store.codeIndex.get(code.toLowerCase())
@@ -238,7 +248,7 @@ function referrerHost(referrer: string | null, ownHost: string | null) {
 }
 
 /** Runs after the redirect response has been sent. */
-export function logClick(urlId: string, ctx: ClickContext, ownHost: string | null) {
+export async function logClick(urlId: string, ctx: ClickContext, ownHost: string | null) {
   const clicks = db().clicksByUrl.get(urlId)
   if (!clicks) return
   const ua = UAParser(ctx.userAgent)
@@ -258,6 +268,7 @@ export function logClick(urlId: string, ctx: ClickContext, ownHost: string | nul
     ipHash: hashIp(ctx.ip),
   }
   clicks.push(click)
+  await persistClick(click, db().urls.get(urlId)?.clicks ?? clicks.length)
 }
 
 function tally(values: string[], limit = 8): Breakdown[] {

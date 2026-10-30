@@ -5,7 +5,10 @@ const globalForSecret = globalThis as unknown as { __snipSecret?: Buffer }
 
 export function serverSecret(): Buffer {
   if (!globalForSecret.__snipSecret) {
-    globalForSecret.__snipSecret = randomBytes(32)
+    const configuredSecret = process.env.SNIP_SESSION_SECRET ?? process.env.SUPABASE_JWT_SECRET
+    globalForSecret.__snipSecret = configuredSecret
+      ? createHash("sha256").update(configuredSecret).digest()
+      : randomBytes(32)
   }
   return globalForSecret.__snipSecret
 }
