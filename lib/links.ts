@@ -8,6 +8,7 @@ import { checkDestination } from "@/lib/safety"
 import type {
   AnalyticsResponse,
   Breakdown,
+  CityBreakdown,
   ClickRecord,
   LinkListResponse,
   LinkStatus,

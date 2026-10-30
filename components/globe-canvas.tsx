@@ -2,7 +2,6 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Globe, { type GlobeMethods } from "react-globe.gl"
-import { Color, type MeshPhongMaterial } from "three"
 import { COUNTRY_FEATURES, viewFor, type CountryFeature } from "@/lib/world"
 import type { CityBreakdown, CountryBreakdown } from "@/lib/types"
 
@@ -74,12 +73,7 @@ export default function GlobeCanvas({
   }, [applyView])
 
   const onReady = useCallback(() => {
-    const globe = globeRef.current
-    if (!globe) return
-    const material = globe.globeMaterial() as MeshPhongMaterial
-    material.color = new Color("#0a0a0a")
-    material.emissive = new Color("#040404")
-    material.shininess = 0.4
+    if (!globeRef.current) return
     applyView(0)
   }, [applyView])
 
