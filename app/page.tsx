@@ -20,7 +20,7 @@ export default async function HomePage() {
       <SiteHeader user={user} />
       <main>
         <section className="relative">
-          <HeroGlobe className="absolute -top-6 -right-28 z-0 size-80 opacity-90 md:-top-10 md:-right-16 md:size-[34rem] lg:right-0" />
+          <HeroGlobe className="absolute -top-10 -right-36 z-0 size-[24rem] opacity-90 sm:size-[28rem] md:-top-14 md:-right-20 md:size-[40rem] lg:right-[-2rem] lg:size-[44rem]" />
           <div className="relative z-10 mx-auto flex max-w-6xl flex-col gap-10 px-4 pt-10 pb-16 md:px-6 md:pt-14 md:pb-24">
             <div className="flex max-w-xl items-center justify-between border-b border-border pb-4">
               <span className="label-caps text-muted-foreground">Edition 26</span>

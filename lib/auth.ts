@@ -40,8 +40,8 @@ export async function createSession(userId: string) {
   const jar = await cookies()
   jar.set(SESSION_COOKIE, `${payload}.${sign(payload)}`, {
     httpOnly: true,
-    secure: true,
-    sameSite: process.env.NODE_ENV === "production" ? "lax" : "none",
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "lax" : "lax",
     path: "/",
     maxAge: SESSION_TTL_SECONDS,
   })
