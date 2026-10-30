@@ -2,7 +2,6 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,7 +9,6 @@ import { Label } from "@/components/ui/label"
 import { api } from "@/lib/client"
 
 export function AuthForm({ mode }: { mode: "login" | "register" }) {
-  const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [pending, setPending] = useState(false)
   const isLogin = mode === "login"
@@ -22,8 +20,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
     setError(null)
     try {
       await api(`/api/auth/${mode}`, { method: "POST", json: { email: form.get("email"), password: form.get("password") } })
-      router.push("/dashboard")
-      router.refresh()
+      window.location.assign("/dashboard")
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong.")
       setPending(false)
