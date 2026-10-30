@@ -1,7 +1,7 @@
 import "server-only"
 import { cookies } from "next/headers"
 import { nanoid } from "nanoid"
-import { db } from "@/lib/db"
+import { db, DEMO_EMAIL } from "@/lib/db"
 import { hashPassword, sign, verifyPassword, verifySignature } from "@/lib/crypto"
 
 const SESSION_COOKIE = "snip_session"
@@ -53,13 +53,22 @@ export async function destroySession() {
 }
 
 export async function getCurrentUser(): Promise<SessionUser | null> {
+  const store = db()
+  const demoUser = store.emailIndex.get(DEMO_EMAIL)
   const jar = await cookies()
   const raw = jar.get(SESSION_COOKIE)?.value
-  if (!raw) return null
+
+  if (!raw) {
+    const user = demoUser ? store.users.get(demoUser) : null
+    return user ? { id: user.id, email: user.email } : null
+  }
+
   const [userId, expires, signature] = raw.split(".")
-  if (!userId || !expires || !signature) return null
-  if (!verifySignature(`${userId}.${expires}`, signature)) return null
-  if (Number(expires) * 1000 < Date.now()) return null
-  const user = db().users.get(userId)
+  if (!userId || !expires || !signature || !verifySignature(`${userId}.${expires}`, signature) || Number(expires) * 1000 < Date.now()) {
+    const user = demoUser ? store.users.get(demoUser) : null
+    return user ? { id: user.id, email: user.email } : null
+  }
+
+  const user = store.users.get(userId)
   return user ? { id: user.id, email: user.email } : null
 }
