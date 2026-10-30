@@ -9,7 +9,11 @@ export function requestHost(headers: Headers): string | null {
 
 export function clickContext(headers: Headers): ClickContext {
   const city = headers.get("x-vercel-ip-city")
+  const latitude = Number.parseFloat(headers.get("x-vercel-ip-latitude") ?? "")
+  const longitude = Number.parseFloat(headers.get("x-vercel-ip-longitude") ?? "")
   return {
+    latitude: Number.isFinite(latitude) ? latitude : null,
+    longitude: Number.isFinite(longitude) ? longitude : null,
     userAgent: headers.get("user-agent") ?? "",
     referrer: headers.get("referer"),
     ip: clientIp(headers),

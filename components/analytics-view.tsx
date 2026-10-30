@@ -7,7 +7,7 @@ import { ArrowLeft } from "lucide-react"
 import { Area, AreaChart, CartesianGrid, Cell, Pie, PieChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
 import { CopyButton } from "@/components/copy-button"
 import { QrPanel } from "@/components/qr-panel"
-import { WorldMap } from "@/components/world-map"
+import { ClickGlobe } from "@/components/click-globe"
 import { displayHost, fetcher, formatDate, shortUrl } from "@/lib/client"
 import type { AnalyticsResponse, Breakdown } from "@/lib/types"
 
@@ -111,11 +111,8 @@ export function AnalyticsView({ id }: { id: string }) {
         <Panel title="Operating systems"><BarList items={data.os} total={data.totalClicks} /></Panel>
       </div>
 
-      <Panel title="Countries">
-        <div className="grid gap-6 md:grid-cols-[2fr_1fr]">
-          <WorldMap countries={data.countries} />
-          <BarList items={data.countries.slice(0, 8).map((c) => ({ name: c.name, clicks: c.clicks }))} total={data.totalClicks} />
-        </div>
+      <Panel title="Click heat map">
+        <ClickGlobe countries={data.countries} cities={data.cities} totalClicks={data.totalClicks} />
       </Panel>
     </div>
   )

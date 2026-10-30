@@ -30,6 +30,8 @@ export type ClickRecord = {
   os: string
   country: string | null
   city: string | null
+  latitude: number | null
+  longitude: number | null
   ipHash: string
 }
 
@@ -66,6 +68,14 @@ export type CountryBreakdown = {
   clicks: number
 }
 
+export type CityBreakdown = {
+  country: string
+  city: string
+  latitude: number
+  longitude: number
+  clicks: number
+}
+
 export type AnalyticsResponse = {
   link: PublicUrl
   range: { from: number; to: number }
@@ -77,4 +87,5 @@ export type AnalyticsResponse = {
   browsers: Breakdown[]
   os: Breakdown[]
   countries: CountryBreakdown[]
+  cities: CityBreakdown[]
 }

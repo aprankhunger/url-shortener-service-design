@@ -1,4 +1,3 @@
-import { GlassObject } from "@/components/glass-object"
 
 const FEATURES = [
   { name: "Custom aliases", body: "Pick a readable code. Availability is checked as you type." },
@@ -12,7 +11,6 @@ const FEATURES = [
 export function FeatureGrid() {
   return (
     <section aria-labelledby="features" className="relative border-t border-border">
-      <GlassObject variant="knot" depth={14} className="absolute top-10 -left-24 z-0 hidden size-72 opacity-80 md:block lg:-left-10" />
       <div className="relative z-10 mx-auto grid max-w-6xl gap-12 px-4 py-20 md:grid-cols-[1fr_1.4fr] md:px-6 md:py-28">
         <div className="flex flex-col gap-6 md:pt-64">
           <h2 id="features" className="font-display text-4xl leading-none tracking-tight md:text-5xl">

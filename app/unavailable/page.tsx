@@ -1,7 +1,6 @@
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { GlassObject } from "@/components/glass-object"
 
 export const metadata = { title: "Link unavailable — SNIP / 26", robots: { index: false } }
 
@@ -18,7 +17,6 @@ export default async function UnavailablePage({ searchParams }: { searchParams: 
   const message = MESSAGES[key]
   return (
     <main className="relative flex min-h-svh items-center overflow-hidden px-4 md:px-6">
-      <GlassObject variant="knot" priority depth={18} className="absolute -right-24 bottom-0 z-0 size-80 opacity-80 md:right-[6%] md:bottom-auto md:size-[30rem]" />
       <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-col gap-6">
         <span className="label-caps text-primary">410 · {key.replace("_", " ")}</span>
         <h1 className="font-display text-5xl leading-none tracking-tight text-balance md:text-7xl">

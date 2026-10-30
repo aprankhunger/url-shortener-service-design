@@ -19,10 +19,12 @@ type Store = {
   clicksByUrl: Map<string, ClickRecord[]>
 }
 
-const globalForStore = globalThis as unknown as { __snipStore?: Store }
+const STORE_VERSION = 2
+const globalForStore = globalThis as unknown as { __snipStore?: Store; __snipStoreVersion?: number }
 
 export function db(): Store {
-  if (!globalForStore.__snipStore) {
+  if (!globalForStore.__snipStore || globalForStore.__snipStoreVersion !== STORE_VERSION) {
+    globalForStore.__snipStoreVersion = STORE_VERSION
     const store: Store = {
       users: new Map(),
       emailIndex: new Map(),
@@ -59,10 +61,12 @@ const BROWSERS = ["Chrome", "Safari", "Firefox", "Edge", "Samsung Internet"]
 const BROWSER_WEIGHTS = [55, 26, 9, 7, 3]
 const OSES = ["Windows", "macOS", "iOS", "Android", "Linux"]
 const OS_WEIGHTS = [28, 24, 22, 20, 6]
-const LOCATIONS: [string, string][] = [
-  ["US", "San Francisco"], ["US", "New York"], ["US", "Austin"], ["GB", "London"], ["DE", "Berlin"],
-  ["IN", "Bengaluru"], ["BR", "São Paulo"], ["CA", "Toronto"], ["FR", "Paris"], ["JP", "Tokyo"],
-  ["AU", "Sydney"], ["NL", "Amsterdam"], ["NG", "Lagos"], ["MX", "Mexico City"], ["SG", "Singapore"],
+const LOCATIONS: [string, string, number, number][] = [
+  ["US", "San Francisco", 37.77, -122.42], ["US", "New York", 40.71, -74.0], ["US", "Austin", 30.27, -97.74],
+  ["GB", "London", 51.51, -0.13], ["DE", "Berlin", 52.52, 13.4], ["IN", "Bengaluru", 12.97, 77.59],
+  ["BR", "São Paulo", -23.55, -46.63], ["CA", "Toronto", 43.65, -79.38], ["FR", "Paris", 48.86, 2.35],
+  ["JP", "Tokyo", 35.68, 139.69], ["AU", "Sydney", -33.87, 151.21], ["NL", "Amsterdam", 52.37, 4.9],
+  ["NG", "Lagos", 6.52, 3.38], ["MX", "Mexico City", 19.43, -99.13], ["SG", "Singapore", 1.35, 103.82],
 ]
 const LOCATION_WEIGHTS = [14, 10, 6, 10, 8, 9, 6, 6, 5, 5, 4, 4, 3, 3, 3]
 
@@ -126,7 +130,7 @@ function seed(store: Store) {
     const clicks = store.clicksByUrl.get(url.id)!
     for (let i = 0; i < entry.clicks; i++) {
       const ageDays = Math.pow(rand(), 1.6) * 30
-      const [country, city] = pick(LOCATIONS, LOCATION_WEIGHTS)
+      const [country, city, latitude, longitude] = pick(LOCATIONS, LOCATION_WEIGHTS)
       const device = pick(DEVICES, DEVICE_WEIGHTS)
       clicks.push({
         id: nanoid(),
@@ -139,6 +143,8 @@ function seed(store: Store) {
         os: device === "desktop" ? pick(["Windows", "macOS", "Linux"], [50, 40, 10]) : pick(OSES.slice(2, 4), OS_WEIGHTS.slice(2, 4)),
         country,
         city,
+ latitude,
+ longitude,
         ipHash: hashIp(`seed-${Math.floor(rand() * entry.clicks * 0.7)}`),
       })
     }

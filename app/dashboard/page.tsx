@@ -3,7 +3,6 @@ import { getCurrentUser } from "@/lib/auth"
 import { SiteHeader } from "@/components/site-header"
 import { ShortenForm } from "@/components/shorten-form"
 import { LinksTable } from "@/components/links-table"
-import { GlassObject } from "@/components/glass-object"
 
 export const metadata = { title: "Dashboard — SNIP / 26" }
 
@@ -13,7 +12,6 @@ export default async function DashboardPage() {
   return (
     <div className="relative overflow-x-clip">
       <SiteHeader user={user} />
-      <GlassObject variant="knot" priority depth={14} className="absolute -top-6 -right-24 z-0 size-64 opacity-80 md:right-0 md:size-80" />
       <main className="relative z-10 mx-auto flex max-w-6xl flex-col gap-14 px-4 py-12 md:px-6 md:py-16">
         <section className="flex flex-col gap-8">
           <div className="flex flex-col gap-4">

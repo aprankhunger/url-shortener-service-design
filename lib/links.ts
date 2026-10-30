@@ -222,6 +222,8 @@ export type ClickContext = {
   ip: string
   country: string | null
   city: string | null
+  latitude: number | null
+  longitude: number | null
 }
 
 function referrerHost(referrer: string | null, ownHost: string | null) {
@@ -250,6 +252,8 @@ export function logClick(urlId: string, ctx: ClickContext, ownHost: string | nul
     os: ua.os.name ?? "Other",
     country: ctx.country,
     city: ctx.city,
+    latitude: ctx.latitude,
+    longitude: ctx.longitude,
     ipHash: hashIp(ctx.ip),
   }
   clicks.push(click)
@@ -294,6 +298,16 @@ export function getAnalytics(userId: string, id: string, from: number, to: numbe
 
   const countryCounts = tally(clicks.map((c) => c.country ?? "Unknown"), 250)
 
+  const cityTotals = new Map<string, CityBreakdown>()
+  for (const c of clicks) {
+    if (!c.country || !c.city || c.latitude == null || c.longitude == null) continue
+    const key = `${c.country}:${c.city}`
+    const entry = cityTotals.get(key)
+    if (entry) entry.clicks++
+    else cityTotals.set(key, { country: c.country, city: c.city, latitude: c.latitude, longitude: c.longitude, clicks: 1 })
+  }
+  const cities = [...cityTotals.values()].sort((a, b) => b.clicks - a.clicks).slice(0, 500)
+
   return {
     link: toPublic(url),
     range: { from, to },
@@ -310,5 +324,6 @@ export function getAnalytics(userId: string, id: string, from: number, to: numbe
       name: code === "Unknown" ? "Unknown" : (regionNames.of(code) ?? code),
       clicks: value,
     })),
+    cities,
   }
 }
