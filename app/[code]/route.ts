@@ -1,12 +1,12 @@
 import { after, NextResponse } from "next/server"
-import { logClick, reserveClick, resolveCode } from "@/lib/links"
+import { logClick, reserveClick, resolveCodePersistent } from "@/lib/links"
 import { clickContext, requestHost } from "@/lib/http"
 
 const NO_STORE = { "Cache-Control": "private, no-store" }
 
 export async function GET(request: Request, { params }: { params: Promise<{ code: string }> }) {
   const { code } = await params
-  const result = resolveCode(code)
+  const result = await resolveCodePersistent(code)
 
   if (result.status === "password") {
     return NextResponse.redirect(new URL(`/p/${encodeURIComponent(result.url.code)}`, request.url), { status: 302, headers: NO_STORE })

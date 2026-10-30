@@ -2,6 +2,77 @@ import "server-only"
 import { nanoid } from "nanoid"
 import { hashIp, hashPassword } from "@/lib/crypto"
 import type { ClickRecord, UrlRecord, User } from "@/lib/types"
+import postgres from "postgres"
+
+const sql = postgres(process.env.POSTGRES_URL ?? process.env.POSTGRES_PRISMA_URL ?? "", { prepare: false, max: 1 })
+let schemaPromise: Promise<void> | null = null
+
+export function ensurePersistentSchema() {
+  if (!schemaPromise) {
+    schemaPromise = (async () => {
+      await sql`CREATE TABLE IF NOT EXISTS snip_links (
+        id text PRIMARY KEY,
+        code text UNIQUE NOT NULL,
+        long_url text NOT NULL,
+        user_id text,
+        custom_alias boolean NOT NULL DEFAULT false,
+        expires_at bigint,
+        password_hash text,
+        click_limit integer,
+        clicks integer NOT NULL DEFAULT 0,
+        is_active boolean NOT NULL DEFAULT true,
+        created_at bigint NOT NULL
+      )`
+      await sql`CREATE INDEX IF NOT EXISTS snip_links_code_idx ON snip_links (lower(code))`
+      await sql`CREATE TABLE IF NOT EXISTS snip_clicks (
+        id text PRIMARY KEY,
+        url_id text NOT NULL REFERENCES snip_links(id) ON DELETE CASCADE,
+        timestamp bigint NOT NULL,
+        referrer text NOT NULL,
+        user_agent text NOT NULL,
+        device text NOT NULL,
+        browser text NOT NULL,
+        os text NOT NULL,
+        country text,
+        city text,
+        latitude double precision,
+        longitude double precision,
+        ip_hash text NOT NULL
+      )`
+      await sql`CREATE INDEX IF NOT EXISTS snip_clicks_url_timestamp_idx ON snip_clicks (url_id, timestamp)`
+    })()
+  }
+  return schemaPromise
+}
+
+export async function persistUrl(url: UrlRecord) {
+  await ensurePersistentSchema()
+  await sql`INSERT INTO snip_links ${sql(urlToRow(url))}
+    ON CONFLICT (id) DO UPDATE SET code=EXCLUDED.code, long_url=EXCLUDED.long_url,
+      password_hash=EXCLUDED.password_hash, expires_at=EXCLUDED.expires_at,
+      click_limit=EXCLUDED.click_limit, clicks=EXCLUDED.clicks, is_active=EXCLUDED.is_active`
+}
+
+export async function loadUrl(code: string): Promise<UrlRecord | null> {
+  await ensurePersistentSchema()
+  const rows = await sql`SELECT id, code, long_url, user_id, custom_alias, expires_at, password_hash, click_limit, clicks, is_active, created_at
+    FROM snip_links WHERE lower(code) = lower(${code}) LIMIT 1`
+  const row = rows[0]
+  if (!row) return null
+  return rowToUrl(row)
+}
+
+export async function persistClick(click: ClickRecord, clicks: number) {
+  await ensurePersistentSchema()
+  await sql.begin(async (tx) => {
+    await tx`INSERT INTO snip_clicks ${tx(clickToRow(click))} ON CONFLICT (id) DO NOTHING`
+    await tx`UPDATE snip_links SET clicks = ${clicks} WHERE id = ${click.urlId}`
+  })
+}
+
+function urlToRow(url: UrlRecord) { return { id: url.id, code: url.code, long_url: url.longUrl, user_id: url.userId, custom_alias: url.customAlias, expires_at: url.expiresAt, password_hash: url.passwordHash, click_limit: url.clickLimit, clicks: url.clicks, is_active: url.isActive, created_at: url.createdAt } }
+function rowToUrl(row: any): UrlRecord { return { id: row.id, code: row.code, longUrl: row.long_url, userId: row.user_id, customAlias: row.custom_alias, expiresAt: row.expires_at == null ? null : Number(row.expires_at), passwordHash: row.password_hash, clickLimit: row.click_limit == null ? null : Number(row.click_limit), clicks: Number(row.clicks), isActive: row.is_active, createdAt: Number(row.created_at) } }
+function clickToRow(click: ClickRecord) { return { id: click.id, url_id: click.urlId, timestamp: click.timestamp, referrer: click.referrer, user_agent: click.userAgent, device: click.device, browser: click.browser, os: click.os, country: click.country, city: click.city, latitude: click.latitude, longitude: click.longitude, ip_hash: click.ipHash } }
 
 /**
  * In-memory stand-in for MongoDB. Each Map mirrors a collection plus the index
