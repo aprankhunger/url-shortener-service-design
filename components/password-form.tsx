@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Lock } from "lucide-react"
+import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -26,28 +26,36 @@ export function PasswordForm({ code }: { code: string }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex w-full max-w-sm flex-col gap-5 rounded-xl border border-border bg-card p-6 shadow-sm">
-      <span className="flex size-10 items-center justify-center rounded-md bg-accent text-accent-foreground">
-        <Lock aria-hidden className="size-5" />
-      </span>
-      <div className="flex flex-col gap-1">
-        <h1 className="text-xl font-semibold tracking-tight">This link is password protected</h1>
-        <p className="text-sm text-muted-foreground">
-          {"Enter the password to continue to "}
-          <span className="font-mono text-foreground">/{code}</span>.
-        </p>
+    <form onSubmit={onSubmit} className="flex flex-col gap-6 rounded-lg border border-border bg-card/70 p-6 shadow-2xl shadow-black/60 backdrop-blur-xl md:p-8">
+      <div className="flex flex-col gap-3">
+        <span className="label-caps text-primary">Protected · /{code}</span>
+        <h1 className="font-display text-3xl leading-none tracking-tight">
+          LOCKED
+          <span className="block text-primary">LINK.</span>
+        </h1>
+        <p className="text-sm leading-relaxed text-muted-foreground">Enter the password to continue.</p>
       </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="link-pass">Password</Label>
-        <Input id="link-pass" type="password" autoFocus required value={password} onChange={(e) => setPassword(e.target.value)} aria-invalid={Boolean(error) || undefined} />
+        <Label htmlFor="link-pass" className="label-caps text-muted-foreground">Password</Label>
+        <Input
+          id="link-pass"
+          type="password"
+          autoFocus
+          required
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          aria-invalid={Boolean(error) || undefined}
+          className="h-11 bg-background"
+        />
       </div>
       {error && (
         <p role="alert" className="text-sm font-medium text-destructive">
           {error}
         </p>
       )}
-      <Button type="submit" size="lg" disabled={pending || !password}>
+      <Button type="submit" className="label-caps h-12 text-xs" disabled={pending || !password}>
         {pending ? "Checking…" : "Continue"}
+        <ArrowRight aria-hidden />
       </Button>
     </form>
   )

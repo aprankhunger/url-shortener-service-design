@@ -3,6 +3,7 @@
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -30,17 +31,21 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex w-full max-w-sm flex-col gap-5 rounded-xl border border-border bg-card p-6 shadow-sm">
-      <div className="flex flex-col gap-1">
-        <h1 className="text-2xl font-semibold tracking-tight">{isLogin ? "Sign in" : "Create your account"}</h1>
-        <p className="text-sm text-muted-foreground">{isLogin ? "Manage links and view analytics." : "Save links and track every click."}</p>
+    <form onSubmit={onSubmit} className="flex w-full max-w-md flex-col gap-6 rounded-lg border border-border bg-card/70 p-6 shadow-2xl shadow-black/60 backdrop-blur-xl md:p-8">
+      <div className="flex flex-col gap-3">
+        <span className="label-caps text-primary">{isLogin ? "Welcome back" : "New account"}</span>
+        <h1 className="font-display text-3xl leading-none tracking-tight">
+          {isLogin ? "SIGN" : "JOIN"}
+          <span className="block text-primary">{isLogin ? "IN." : "SNIP."}</span>
+        </h1>
+        <p className="text-sm leading-relaxed text-muted-foreground">{isLogin ? "Manage links and view analytics." : "Save links and track every click."}</p>
       </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="email">Email</Label>
-        <Input id="email" name="email" type="email" autoComplete="email" required defaultValue={isLogin ? "demo@snip.dev" : ""} />
+        <Label htmlFor="email" className="label-caps text-muted-foreground">Email</Label>
+        <Input id="email" name="email" type="email" autoComplete="email" required defaultValue={isLogin ? "demo@snip.dev" : ""} className="h-11 bg-background" />
       </div>
       <div className="flex flex-col gap-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password" className="label-caps text-muted-foreground">Password</Label>
         <Input
           id="password"
           name="password"
@@ -49,6 +54,7 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
           minLength={8}
           required
           defaultValue={isLogin ? "demo1234" : ""}
+          className="h-11 bg-background"
         />
       </div>
       {error && (
@@ -56,12 +62,13 @@ export function AuthForm({ mode }: { mode: "login" | "register" }) {
           {error}
         </p>
       )}
-      <Button type="submit" size="lg" disabled={pending}>
+      <Button type="submit" className="label-caps h-12 text-xs" disabled={pending}>
         {pending ? "Please wait…" : isLogin ? "Sign in" : "Create account"}
+        <ArrowRight aria-hidden />
       </Button>
       <p className="text-center text-sm text-muted-foreground">
         {isLogin ? "No account? " : "Already registered? "}
-        <Link href={isLogin ? "/register" : "/login"} className="font-medium text-foreground underline underline-offset-4">
+        <Link href={isLogin ? "/register" : "/login"} className="font-medium text-primary underline-offset-4 hover:underline">
           {isLogin ? "Create one" : "Sign in"}
         </Link>
       </p>

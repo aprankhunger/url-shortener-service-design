@@ -32,39 +32,48 @@ export function AnalyticsView({ id }: { id: string }) {
 
   const { link } = data
   return (
-    <div className="flex flex-col gap-6">
-      <Link href="/dashboard" className="flex w-fit items-center gap-1 text-sm text-muted-foreground hover:text-foreground">
-        <ArrowLeft aria-hidden className="size-4" />
+    <div className="flex flex-col gap-8">
+      <Link href="/dashboard" className="label-caps flex w-fit items-center gap-2 text-muted-foreground transition-colors hover:text-primary">
+        <ArrowLeft aria-hidden className="size-3.5" />
         All links
       </Link>
 
-      <header className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5 md:flex-row md:items-center md:justify-between">
-        <div className="flex min-w-0 flex-col gap-2">
-          <div className="flex flex-wrap items-center gap-2">
-            <h1 className="break-all font-mono text-2xl font-semibold text-primary">{displayHost(link.code)}</h1>
-            <CopyButton value={shortUrl(link.code)} size="icon-sm" />
-            <span className="rounded-sm bg-secondary px-2 py-0.5 text-xs font-medium capitalize">{link.status}</span>
+      <header className="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+        <div className="flex min-w-0 flex-col gap-4">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="label-caps text-primary">Analytics</span>
+            <span className="label-caps rounded-sm border border-border px-2 py-0.5 text-muted-foreground">{link.status}</span>
           </div>
-          <p className="truncate text-sm text-muted-foreground" title={link.longUrl}>{"→ "}{link.longUrl}</p>
-          <p className="text-xs text-muted-foreground">Created {formatDate(link.createdAt)}</p>
+          <h1 className="font-display text-4xl leading-none tracking-tight md:text-6xl">
+            {data.totalClicks.toLocaleString()}
+            <span className="block text-primary">CLICKS.</span>
+          </h1>
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="break-all font-display text-sm md:text-base">{displayHost(link.code)}</span>
+            <CopyButton value={shortUrl(link.code)} size="icon-sm" />
+          </div>
+          <p className="max-w-xl truncate text-sm text-muted-foreground" title={link.longUrl}>{"→ "}{link.longUrl}</p>
+          <p className="label-caps text-muted-foreground">Created {formatDate(link.createdAt)}</p>
         </div>
-        <QrPanel value={shortUrl(link.code)} code={link.code} size={112} />
+        <div className="rounded-lg border border-border bg-card/70 p-4 backdrop-blur-xl">
+          <QrPanel value={shortUrl(link.code)} code={link.code} size={112} />
+        </div>
       </header>
 
-      <div className="flex flex-wrap items-center justify-between gap-4">
-        <dl className="flex gap-8">
+      <div className="flex flex-wrap items-end justify-between gap-6 border-t border-border pt-6">
+        <dl className="flex gap-10">
           <Stat label="Clicks" value={data.totalClicks} />
           <Stat label="Unique visitors" value={data.uniqueVisitors} />
           <Stat label="All-time" value={link.clicks} />
         </dl>
-        <div role="group" aria-label="Date range" className="flex rounded-lg border border-border bg-card p-0.5">
+        <div role="group" aria-label="Date range" className="flex rounded-md border border-border bg-card p-1">
           {RANGES.map((range) => (
             <button
               key={range.label}
               type="button"
               aria-pressed={days === range.days}
               onClick={() => setDays(range.days)}
-              className={`rounded-md px-3 py-1 font-mono text-sm ${days === range.days ? "bg-foreground text-background" : "text-muted-foreground hover:text-foreground"}`}
+              className={`label-caps rounded-sm px-3 py-1.5 transition-colors ${days === range.days ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"}`}
             >
               {range.label}
             </button>
@@ -79,8 +88,17 @@ export function AnalyticsView({ id }: { id: string }) {
               <CartesianGrid vertical={false} stroke="var(--border)" />
               <XAxis dataKey="date" tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} tickFormatter={(d: string) => d.slice(5)} minTickGap={24} />
               <YAxis allowDecimals={false} tickLine={false} axisLine={false} tick={{ fontSize: 12, fill: "var(--muted-foreground)" }} />
-              <Tooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
-              <Area type="monotone" dataKey="clicks" stroke="var(--chart-1)" strokeWidth={2} fill="var(--chart-1)" fillOpacity={0.12} />
+              <Tooltip
+                cursor={{ stroke: "var(--chart-1)", strokeOpacity: 0.4 }}
+                contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 4, fontSize: 12, color: "var(--foreground)" }}
+              />
+              <defs>
+                <linearGradient id="clicksFill" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="var(--chart-1)" stopOpacity={0.35} />
+                  <stop offset="100%" stopColor="var(--chart-1)" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <Area type="monotone" dataKey="clicks" stroke="var(--chart-1)" strokeWidth={2} fill="url(#clicksFill)" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
@@ -105,17 +123,17 @@ export function AnalyticsView({ id }: { id: string }) {
 
 function Stat({ label, value }: { label: string; value: number }) {
   return (
-    <div className="flex flex-col">
-      <dt className="text-xs uppercase tracking-wider text-muted-foreground">{label}</dt>
-      <dd className="font-mono text-3xl font-semibold tabular-nums">{value.toLocaleString()}</dd>
+    <div className="flex flex-col gap-2">
+      <dt className="label-caps text-muted-foreground">{label}</dt>
+      <dd className="font-display text-3xl tabular-nums">{value.toLocaleString()}</dd>
     </div>
   )
 }
 
 function Panel({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5">
-      <h2 className="text-sm font-semibold">{title}</h2>
+    <section className="flex flex-col gap-5 rounded-lg border border-border bg-card/70 p-5 backdrop-blur-xl md:p-6">
+      <h2 className="label-caps text-muted-foreground">{title}</h2>
       {children}
     </section>
   )
@@ -128,9 +146,9 @@ function BarList({ items, total }: { items: Breakdown[]; total: number }) {
     <ul className="flex flex-col gap-2">
       {items.map((item) => (
         <li key={item.name} className="relative flex items-center justify-between gap-4 rounded-sm px-2 py-1.5 text-sm">
-          <span aria-hidden className="absolute inset-y-0 left-0 rounded-sm bg-primary/10" style={{ width: `${(item.clicks / max) * 100}%` }} />
+          <span aria-hidden className="absolute inset-y-0 left-0 rounded-sm border-l-2 border-primary bg-primary/10" style={{ width: `${(item.clicks / max) * 100}%` }} />
           <span className="relative truncate">{item.name}</span>
-          <span className="relative font-mono tabular-nums text-muted-foreground">
+          <span className="relative tabular-nums text-muted-foreground">
             {item.clicks.toLocaleString()}
             <span className="ml-2 inline-block w-10 text-right">{total ? Math.round((item.clicks / total) * 100) : 0}%</span>
           </span>
@@ -150,7 +168,7 @@ function Donut({ items }: { items: Breakdown[] }) {
             <Pie data={items} dataKey="clicks" nameKey="name" innerRadius="60%" outerRadius="100%" stroke="var(--card)" strokeWidth={2}>
               {items.map((item, index) => <Cell key={item.name} fill={PIE_COLORS[index % PIE_COLORS.length]} />)}
             </Pie>
-            <Tooltip contentStyle={{ background: "var(--card)", border: "1px solid var(--border)", borderRadius: 8, fontSize: 12 }} />
+            <Tooltip contentStyle={{ background: "var(--popover)", border: "1px solid var(--border)", borderRadius: 4, fontSize: 12, color: "var(--foreground)" }} />
           </PieChart>
         </ResponsiveContainer>
       </div>

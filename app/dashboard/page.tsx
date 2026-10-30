@@ -3,22 +3,32 @@ import { getCurrentUser } from "@/lib/auth"
 import { SiteHeader } from "@/components/site-header"
 import { ShortenForm } from "@/components/shorten-form"
 import { LinksTable } from "@/components/links-table"
+import { GlassObject } from "@/components/glass-object"
 
-export const metadata = { title: "Dashboard — snip" }
+export const metadata = { title: "Dashboard — SNIP / 26" }
 
 export default async function DashboardPage() {
   const user = await getCurrentUser()
   if (!user) redirect("/login")
   return (
-    <>
+    <div className="relative overflow-x-clip">
       <SiteHeader user={user} />
-      <main className="mx-auto flex max-w-6xl flex-col gap-10 px-4 py-10 md:px-6">
-        <section className="flex flex-col gap-4">
-          <h1 className="text-3xl font-semibold tracking-tight">Your links</h1>
-          <ShortenForm signedIn />
+      <GlassObject variant="knot" priority depth={14} className="absolute -top-6 -right-24 z-0 size-64 opacity-80 md:right-0 md:size-80" />
+      <main className="relative z-10 mx-auto flex max-w-6xl flex-col gap-14 px-4 py-12 md:px-6 md:py-16">
+        <section className="flex flex-col gap-8">
+          <div className="flex flex-col gap-4">
+            <span className="label-caps text-primary">Dashboard</span>
+            <h1 className="font-display text-4xl leading-none tracking-tight md:text-6xl">
+              YOUR
+              <span className="block text-primary">LINKS.</span>
+            </h1>
+          </div>
+          <div className="max-w-3xl">
+            <ShortenForm signedIn />
+          </div>
         </section>
         <LinksTable />
       </main>
-    </>
+    </div>
   )
 }

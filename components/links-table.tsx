@@ -13,10 +13,10 @@ import { api, fetcher, formatDate, shortUrl } from "@/lib/client"
 import type { LinkListResponse, LinkStatus, PublicUrl } from "@/lib/types"
 
 const STATUS_STYLES: Record<LinkStatus, string> = {
-  active: "bg-primary/10 text-primary",
-  disabled: "bg-secondary text-muted-foreground",
-  expired: "bg-destructive/10 text-destructive",
-  exhausted: "bg-accent text-accent-foreground",
+  active: "bg-primary text-primary-foreground",
+  disabled: "border border-border text-muted-foreground",
+  expired: "bg-destructive/15 text-destructive",
+  exhausted: "border border-primary/40 text-primary",
 }
 
 export function LinksTable() {
@@ -69,29 +69,29 @@ export function LinksTable() {
   return (
     <section aria-labelledby="links-heading" className="flex flex-col gap-4">
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-        <h2 id="links-heading" className="text-lg font-semibold">
-          {"Saved links "}
-          <span className="font-mono text-sm font-normal text-muted-foreground">{data ? `(${data.total})` : ""}</span>
+        <h2 id="links-heading" className="flex items-baseline gap-3 font-display text-2xl tracking-tight">
+          SAVED
+          <span className="text-primary">{data ? data.total : ""}</span>
         </h2>
-        <div className="relative md:w-72">
+        <div className="relative md:w-80">
           <Search aria-hidden className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input type="search" aria-label="Search links" placeholder="Search code or destination" value={query} onChange={(e) => setQuery(e.target.value)} className="bg-card pl-9" />
+          <Input type="search" aria-label="Search links" placeholder="Search code or destination" value={query} onChange={(e) => setQuery(e.target.value)} className="h-10 bg-card pl-9" />
         </div>
       </div>
 
       {selected.size > 0 && (
-        <div role="toolbar" aria-label="Bulk actions" className="flex flex-wrap items-center gap-2 rounded-lg border border-border bg-foreground px-3 py-2 text-background">
-          <span className="text-sm font-medium">{selected.size} selected</span>
+        <div role="toolbar" aria-label="Bulk actions" className="flex flex-wrap items-center gap-2 rounded-md bg-primary px-3 py-2 text-primary-foreground">
+          <span className="label-caps">{selected.size} selected</span>
           <Button size="sm" variant="secondary" onClick={() => runBulk("enable")}>Enable</Button>
           <Button size="sm" variant="secondary" onClick={() => runBulk("disable")}>Disable</Button>
           <Button size="sm" variant="secondary" className="text-destructive" onClick={() => runBulk("delete")}>Delete</Button>
-          <Button size="sm" variant="ghost" className="ml-auto text-background hover:bg-background/10 hover:text-background" onClick={() => setSelected(new Set())}>Clear</Button>
+          <Button size="sm" variant="ghost" className="ml-auto text-primary-foreground hover:bg-primary-foreground/10 hover:text-primary-foreground" onClick={() => setSelected(new Set())}>Clear</Button>
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-border bg-card">
+      <div className="overflow-x-auto rounded-lg border border-border bg-card/70 backdrop-blur-xl">
         <table className="w-full min-w-[720px] text-sm">
-          <thead className="border-b border-border text-left text-xs uppercase tracking-wider text-muted-foreground">
+          <thead className="label-caps border-b border-border text-left text-muted-foreground">
             <tr>
               <th scope="col" className="w-10 px-4 py-3">
                 <Checkbox
@@ -122,7 +122,7 @@ export function LinksTable() {
                 </td>
                 <td className="px-2 py-3">
                   <div className="flex items-center gap-1">
-                    <Link href={`/dashboard/${link.id}`} className="font-mono font-semibold text-primary hover:underline">/{link.code}</Link>
+                    <Link href={`/dashboard/${link.id}`} className="font-display text-xs text-foreground transition-colors hover:text-primary">/{link.code}</Link>
                     {link.hasPassword && <Lock aria-label="Password protected" className="size-3.5 text-muted-foreground" />}
                     <CopyButton value={shortUrl(link.code)} size="icon-sm" />
                   </div>
@@ -137,7 +137,7 @@ export function LinksTable() {
                     type="button"
                     onClick={() => toggleActive(link)}
                     title={link.isActive ? "Click to disable" : "Click to enable"}
-                    className={`rounded-sm px-2 py-0.5 text-xs font-medium capitalize ${STATUS_STYLES[link.status]}`}
+                    className={`label-caps rounded-sm px-2 py-1 ${STATUS_STYLES[link.status]}`}
                   >
                     {link.status}
                   </button>

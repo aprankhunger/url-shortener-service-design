@@ -1,13 +1,13 @@
 import { Analytics } from '@vercel/analytics/next'
 import type { Metadata, Viewport } from 'next'
-import { Instrument_Sans, JetBrains_Mono } from 'next/font/google'
+import { Michroma, Poppins } from 'next/font/google'
 import './globals.css'
 
-const instrument = Instrument_Sans({ subsets: ['latin'], variable: '--font-instrument' })
-const jetbrains = JetBrains_Mono({ subsets: ['latin'], variable: '--font-jetbrains' })
+const michroma = Michroma({ subsets: ['latin'], weight: '400', variable: '--font-michroma' })
+const poppins = Poppins({ subsets: ['latin'], weight: ['300', '400', '500', '600'], variable: '--font-poppins' })
 
 export const metadata: Metadata = {
-  title: 'snip — fast short links with real analytics',
+  title: 'SNIP / 26 — short links with real analytics',
   description:
     'Shorten URLs with custom aliases, expiry, click limits and passwords. Every redirect is logged with referrer, device, browser and country.',
   generator: 'v0.app',
@@ -22,8 +22,8 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'light',
-  themeColor: '#eceef2',
+  colorScheme: 'dark',
+  themeColor: '#070707',
 }
 
 export default function RootLayout({
@@ -32,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" className={`${instrument.variable} ${jetbrains.variable} bg-background`}>
+    <html lang="en" className={`${michroma.variable} ${poppins.variable} bg-background`}>
       <body className="font-sans antialiased">
         {children}
         {process.env.NODE_ENV === 'production' && <Analytics />}

@@ -23,7 +23,7 @@ export async function POST(request: Request) {
 
   try {
     const body = await readJson(request)
-    const link = createLink(body, user?.id ?? null, requestHost(request.headers))
+    const link = createLink({ ...body, longUrl: body.longUrl }, user?.id ?? null, requestHost(request.headers))
     return NextResponse.json(link, { status: 201 })
   } catch (error) {
     return errorResponse(error)

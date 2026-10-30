@@ -5,30 +5,27 @@ import type { SessionUser } from "@/lib/auth"
 
 export function SiteHeader({ user }: { user: SessionUser | null }) {
   return (
-    <header className="border-b border-border bg-card">
-      <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 md:px-6">
-        <Link href="/" className="flex items-center gap-2 font-mono text-base font-semibold tracking-tight">
-          <span aria-hidden className="flex size-6 items-center justify-center rounded-sm bg-primary text-xs text-primary-foreground">
-            {"/>"}
-          </span>
-          snip
+    <header className="relative z-20 border-b border-border/80 bg-background/70 backdrop-blur-md">
+      <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4 md:px-6">
+        <Link href="/" className="font-display text-sm tracking-wide text-foreground md:text-base">
+          SNIP <span className="text-primary">/</span> 26
         </Link>
-        <nav aria-label="Account" className="flex items-center gap-2">
+        <nav aria-label="Account" className="flex items-center gap-1 md:gap-2">
           {user ? (
             <>
-              <Button variant="ghost" size="sm" nativeButton={false} render={<Link href="/dashboard" />}>
+              <Button variant="ghost" size="sm" className="label-caps" nativeButton={false} render={<Link href="/dashboard" />}>
                 Dashboard
               </Button>
-              <span className="hidden text-sm text-muted-foreground md:inline">{user.email}</span>
+              <span className="label-caps hidden text-muted-foreground lg:inline">{user.email}</span>
               <LogoutButton />
             </>
           ) : (
             <>
-              <Button variant="ghost" size="sm" nativeButton={false} render={<Link href="/login" />}>
+              <Button variant="ghost" size="sm" className="label-caps" nativeButton={false} render={<Link href="/login" />}>
                 Sign in
               </Button>
-              <Button size="sm" nativeButton={false} render={<Link href="/register" />}>
-                Create account
+              <Button size="sm" className="label-caps" nativeButton={false} render={<Link href="/register" />}>
+                {"Get started →"}
               </Button>
             </>
           )}

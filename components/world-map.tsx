@@ -13,7 +13,7 @@ export function WorldMap({ countries }: { countries: CountryBreakdown[] }) {
 
   return (
     <figure className="flex flex-col gap-2">
-      <div className="overflow-hidden rounded-lg bg-muted">
+      <div className="overflow-hidden rounded-md border border-border bg-background">
         <ComposableMap projectionConfig={{ scale: 150 }} height={380} aria-label="Clicks by country">
           <Geographies geography={GEO_URL}>
             {({ geographies }) =>
@@ -26,11 +26,11 @@ export function WorldMap({ countries }: { countries: CountryBreakdown[] }) {
                     geography={geo}
                     onMouseEnter={() => setHovered(entry ? `${entry.name}: ${entry.clicks.toLocaleString()} clicks` : (geo.properties?.name as string))}
                     onMouseLeave={() => setHovered(null)}
-                    style={{
-                      default: { fill: entry ? "var(--chart-1)" : "var(--border)", fillOpacity: entry ? intensity : 1, stroke: "var(--muted)", strokeWidth: 0.5, outline: "none" },
-                      hover: { fill: entry ? "var(--accent)" : "var(--input)", fillOpacity: 1, stroke: "var(--muted)", strokeWidth: 0.5, outline: "none" },
-                      pressed: { outline: "none" },
-                    }}
+                    fill={entry ? "var(--chart-1)" : "var(--secondary)"}
+                    fillOpacity={entry ? intensity : 1}
+                    stroke="var(--background)"
+                    strokeWidth={0.5}
+                    className="outline-none transition-[fill,fill-opacity] hover:fill-opacity-100 hover:fill-[var(--foreground)]"
                   />
                 )
               })
@@ -38,7 +38,7 @@ export function WorldMap({ countries }: { countries: CountryBreakdown[] }) {
           </Geographies>
         </ComposableMap>
       </div>
-      <figcaption aria-live="polite" className="min-h-5 font-mono text-xs text-muted-foreground">
+      <figcaption aria-live="polite" className="min-h-5 text-xs text-muted-foreground">
         {hovered ?? "Hover a country for details. Location comes from edge geo headers."}
       </figcaption>
     </figure>

@@ -5,8 +5,9 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
-  --font-sans: var(--font-instrument), 'Instrument Sans', ui-sans-serif, system-ui, sans-serif;
-  --font-mono: var(--font-jetbrains), 'JetBrains Mono', ui-monospace, monospace;
+  --font-sans: var(--font-poppins), 'Poppins', ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-michroma), 'Michroma', ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-michroma), 'Michroma', ui-monospace, monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -40,31 +41,31 @@
 }
 
 :root {
-  color-scheme: light;
-  --background: #eceef2;
-  --foreground: #12141a;
-  --card: #ffffff;
-  --card-foreground: #12141a;
-  --popover: #ffffff;
-  --popover-foreground: #12141a;
-  --primary: #2340e6;
-  --primary-foreground: #ffffff;
-  --secondary: #e1e4ea;
-  --secondary-foreground: #12141a;
-  --muted: #e1e4ea;
-  --muted-foreground: #565c6b;
-  --accent: #ffb224;
-  --accent-foreground: #12141a;
-  --destructive: #d1301f;
-  --border: #d3d7df;
-  --input: #c9ced8;
-  --ring: #2340e6;
-  --chart-1: #2340e6;
-  --chart-2: #ffb224;
-  --chart-3: #12141a;
-  --chart-4: #8a93a6;
-  --chart-5: #b7c1ff;
-  --radius: 0.5rem;
+  color-scheme: dark;
+  --background: #070707;
+  --foreground: #ededea;
+  --card: #0f0f0f;
+  --card-foreground: #ededea;
+  --popover: #121212;
+  --popover-foreground: #ededea;
+  --primary: #c8ff3d;
+  --primary-foreground: #070707;
+  --secondary: #1a1a1a;
+  --secondary-foreground: #ededea;
+  --muted: #141414;
+  --muted-foreground: #8b8b86;
+  --accent: #c8ff3d;
+  --accent-foreground: #070707;
+  --destructive: #ff5a4e;
+  --border: #232323;
+  --input: #2c2c2c;
+  --ring: #c8ff3d;
+  --chart-1: #c8ff3d;
+  --chart-2: #ededea;
+  --chart-3: #8b8b86;
+  --chart-4: #4a4a47;
+  --chart-5: #2c2c2c;
+  --radius: 0.25rem;
 }
 
 @layer base {
@@ -73,5 +74,59 @@
   }
   body {
     @apply bg-background text-foreground font-sans;
+  }
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+}
+
+@utility label-caps {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+@utility glass-blend {
+  mix-blend-mode: screen;
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    translate: 0 0;
+    rotate: 0deg;
+  }
+  50% {
+    translate: 0 -14px;
+    rotate: 4deg;
+  }
+}
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-drift {
+  animation: drift 9s ease-in-out infinite;
+}
+
+@utility animate-rise {
+  animation: rise 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-drift,
+  .animate-rise {
+    animation: none;
   }
 }
